@@ -16,6 +16,9 @@ import (
 	profilerepo "portfolio-ai/internal/profile/repository"
 	profilesvc "portfolio-ai/internal/profile/service"
 	profilegrpc "portfolio-ai/internal/profile/grpc"
+	projectrepo "portfolio-ai/internal/project/repository"
+	projectsvc "portfolio-ai/internal/project/service"
+	projectgrpc "portfolio-ai/internal/project/grpc"
 	promptrepo "portfolio-ai/internal/prompt/repository"
 	promptsvc "portfolio-ai/internal/prompt/service"
 	promptgrpc "portfolio-ai/internal/prompt/grpc"
@@ -28,6 +31,7 @@ import (
 	pb "portfolio-ai/proto/auth"
 	chatpb "portfolio-ai/proto/chat"
 	profilepb "portfolio-ai/proto/profile"
+	projectpb "portfolio-ai/proto/project"
 	promptpb "portfolio-ai/proto/prompt"
 	visitorpb "portfolio-ai/proto/visitor"
 
@@ -107,6 +111,13 @@ func NewApp() (*App, error) {
 	aimodelHandler := aimodelgrpc.NewHandler(aimodelService)
 	aimodelpb.RegisterAIModelServiceServer(grpcServer, aimodelHandler)
 	logger.Info("AIModel service registered")
+
+	// 12. Initialize Project module
+	projectRepo := projectrepo.NewPostgresRepository(db)
+	projectService := projectsvc.NewService(projectRepo)
+	projectHandler := projectgrpc.NewHandler(projectService)
+	projectpb.RegisterProjectServiceServer(grpcServer, projectHandler)
+	logger.Info("Project service registered")
 
 	return &App{
 		Config:     cfg,

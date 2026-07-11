@@ -14,63 +14,71 @@ Foundation
 
 Phase 2
 ────────────────────
-Core Application
+Portfolio CMS
 
 • Authentication
-• profile
-• prompts
-• visitor
-• chat_sessions
-• chat_messages
+• Profile
+• Prompt
+• Visitor
+• Chat Session
+• Chat Message
 
 ↓
 
 Phase 3
-────────────────
-Knowledge Base
+────────────────────
+Knowledge Layer
 
-Knowledge Documents
-Knowledge Chunks
+• Projects
+• Experiences
+• Certificates
+• Technologies
+• Skills
+• Knowledge Documents
+• Knowledge Chunks
+• AI Models
 
 ↓
 
 Phase 4
-────────────────
+────────────────────
 Background Processing
 
-Kafka
-Outbox
-Event Worker
-Embedding Worker
+• Kafka
+• Outbox Pattern
+• Event Producer
+• Event Worker
+• Embedding Worker
 
 ↓
 
 Phase 5
-────────────────
+────────────────────
 Vector Search
 
-Chunking
-Embedding
-Milvus
+• Chunking Pipeline
+• Embedding
+• Milvus
+• Semantic Search
 
 ↓
 
 Phase 6
-────────────────
+────────────────────
 AI Agent
 
-LLM Provider
-AI Models (aktif digunakan)
-Prompt Builder
-Conversation Memory
-RAG
-Tool Calling (ai_tools mulai digunakan)
+• Prompt Builder
+• Conversation Memory
+• RAG
+• Tool Calling
+• LLM Provider (Gemini/OpenAI/Ollama)
 
 ↓
 
 Phase 7
-────────────────
+────────────────────
 Realtime
 
-gRPC Server Streaming
-Typing Animation
+• gRPC Server Streaming
+• Streaming Response
+• Typing Animation

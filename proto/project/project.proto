@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package project;
+
+option go_package = "portfolio-ai/proto/project";
+
+import "google/protobuf/timestamp.proto";
+
+message Project {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  string summary = 4;
+  string description = 5;
+  string architecture = 6;
+  string repository_url = 7;
+  string demo_url = 8;
+  string thumbnail = 9;
+  bool featured = 10;
+  string status = 11;
+  int32 github_stars = 12;
+  google.protobuf.Timestamp github_last_commit = 13;
+  int32 read_time = 14;
+  google.protobuf.Timestamp created_at = 15;
+  google.protobuf.Timestamp updated_at = 16;
+}

@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package project;
+
+option go_package = "portfolio-ai/proto/project";
+
+import "project/project.proto";
+
+service ProjectService {
+  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse);
+  rpc GetProject(GetProjectRequest) returns (GetProjectResponse);
+  rpc CreateProject(CreateProjectRequest) returns (CreateProjectResponse);
+  rpc UpdateProject(UpdateProjectRequest) returns (UpdateProjectResponse);
+  rpc DeleteProject(DeleteProjectRequest) returns (DeleteProjectResponse);
+}
+
+message ListProjectsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message ListProjectsResponse {
+  repeated Project projects = 1;
+  int32 total = 2;
+}
+
+message GetProjectRequest {
+  string id = 1;
+}
+
+message GetProjectResponse {
+  Project project = 1;
+}
+
+message CreateProjectRequest {
+  string slug = 1;
+  string title = 2;
+  string summary = 3;
+  string description = 4;
+  string architecture = 5;
+  string repository_url = 6;
+  string demo_url = 7;
+  string thumbnail = 8;
+  bool featured = 9;
+  string status = 10;
+  int32 github_stars = 11;
+  int32 read_time = 12;
+}
+
+message CreateProjectResponse {
+  Project project = 1;
+}
+
+message UpdateProjectRequest {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  string summary = 4;
+  string description = 5;
+  string architecture = 6;
+  string repository_url = 7;
+  string demo_url = 8;
+  string thumbnail = 9;
+  bool featured = 10;
+  string status = 11;
+  int32 github_stars = 12;
+  int32 read_time = 13;
+}
+
+message UpdateProjectResponse {
+  Project project = 1;
+}
+
+message DeleteProjectRequest {
+  string id = 1;
+}
+
+message DeleteProjectResponse {
+  bool success = 1;
+}

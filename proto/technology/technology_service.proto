@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package technology;
+
+option go_package = "portfolio-ai/proto/technology";
+
+import "technology/technology.proto";
+
+service TechnologyService {
+  rpc ListTechnologies(ListTechnologiesRequest) returns (ListTechnologiesResponse);
+  rpc GetTechnology(GetTechnologyRequest) returns (GetTechnologyResponse);
+  rpc CreateTechnology(CreateTechnologyRequest) returns (CreateTechnologyResponse);
+  rpc UpdateTechnology(UpdateTechnologyRequest) returns (UpdateTechnologyResponse);
+  rpc DeleteTechnology(DeleteTechnologyRequest) returns (DeleteTechnologyResponse);
+}
+
+message ListTechnologiesRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message ListTechnologiesResponse {
+  repeated Technology technologies = 1;
+  int32 total = 2;
+}
+
+message GetTechnologyRequest {
+  string id = 1;
+}
+
+message GetTechnologyResponse {
+  Technology technology = 1;
+}
+
+message CreateTechnologyRequest {
+  string name = 1;
+  string category = 2;
+  string icon = 3;
+  string color = 4;
+  string official_url = 5;
+  string logo = 6;
+}
+
+message CreateTechnologyResponse {
+  Technology technology = 1;
+}
+
+message UpdateTechnologyRequest {
+  string id = 1;
+  string name = 2;
+  string category = 3;
+  string icon = 4;
+  string color = 5;
+  string official_url = 6;
+  string logo = 7;
+}
+
+message UpdateTechnologyResponse {
+  Technology technology = 1;
+}
+
+message DeleteTechnologyRequest {
+  string id = 1;
+}
+
+message DeleteTechnologyResponse {
+  bool success = 1;
+}

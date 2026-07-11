@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package skill;
+
+option go_package = "portfolio-ai/proto/skill";
+
+import "skill/skill.proto";
+
+service SkillService {
+  rpc ListSkills(ListSkillsRequest) returns (ListSkillsResponse);
+  rpc GetSkill(GetSkillRequest) returns (GetSkillResponse);
+  rpc CreateSkill(CreateSkillRequest) returns (CreateSkillResponse);
+  rpc UpdateSkill(UpdateSkillRequest) returns (UpdateSkillResponse);
+  rpc DeleteSkill(DeleteSkillRequest) returns (DeleteSkillResponse);
+}
+
+message ListSkillsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message ListSkillsResponse {
+  repeated Skill skills = 1;
+  int32 total = 2;
+}
+
+message GetSkillRequest {
+  string id = 1;
+}
+
+message GetSkillResponse {
+  Skill skill = 1;
+}
+
+message CreateSkillRequest {
+  int32 display_order = 1;
+  string technology_id = 2;
+  string level = 3;
+  float years = 4;
+  bool favorite = 5;
+}
+
+message CreateSkillResponse {
+  Skill skill = 1;
+}
+
+message UpdateSkillRequest {
+  string id = 1;
+  int32 display_order = 2;
+  string technology_id = 3;
+  string level = 4;
+  float years = 5;
+  bool favorite = 6;
+}
+
+message UpdateSkillResponse {
+  Skill skill = 1;
+}
+
+message DeleteSkillRequest {
+  string id = 1;
+}
+
+message DeleteSkillResponse {
+  bool success = 1;
+}

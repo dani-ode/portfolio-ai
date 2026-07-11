@@ -19,6 +19,18 @@ import (
 	projectrepo "portfolio-ai/internal/project/repository"
 	projectsvc "portfolio-ai/internal/project/service"
 	projectgrpc "portfolio-ai/internal/project/grpc"
+	experiencerepo "portfolio-ai/internal/experience/repository"
+	experiencesvc "portfolio-ai/internal/experience/service"
+	experiencegrpc "portfolio-ai/internal/experience/grpc"
+	techrepo "portfolio-ai/internal/technology/repository"
+	techsvc "portfolio-ai/internal/technology/service"
+	techgrpc "portfolio-ai/internal/technology/grpc"
+	certrepo "portfolio-ai/internal/certificate/repository"
+	certsvc "portfolio-ai/internal/certificate/service"
+	certgrpc "portfolio-ai/internal/certificate/grpc"
+	skillrepo "portfolio-ai/internal/skill/repository"
+	skillsvc "portfolio-ai/internal/skill/service"
+	skillgrpc "portfolio-ai/internal/skill/grpc"
 	promptrepo "portfolio-ai/internal/prompt/repository"
 	promptsvc "portfolio-ai/internal/prompt/service"
 	promptgrpc "portfolio-ai/internal/prompt/grpc"
@@ -32,6 +44,10 @@ import (
 	chatpb "portfolio-ai/proto/chat"
 	profilepb "portfolio-ai/proto/profile"
 	projectpb "portfolio-ai/proto/project"
+	experiencepb "portfolio-ai/proto/experience"
+	techpb "portfolio-ai/proto/technology"
+	certpb "portfolio-ai/proto/certificate"
+	skillpb "portfolio-ai/proto/skill"
 	promptpb "portfolio-ai/proto/prompt"
 	visitorpb "portfolio-ai/proto/visitor"
 
@@ -118,6 +134,34 @@ func NewApp() (*App, error) {
 	projectHandler := projectgrpc.NewHandler(projectService)
 	projectpb.RegisterProjectServiceServer(grpcServer, projectHandler)
 	logger.Info("Project service registered")
+
+	// 13. Initialize Experience module
+	experienceRepo := experiencerepo.NewPostgresRepository(db)
+	experienceService := experiencesvc.NewService(experienceRepo)
+	experienceHandler := experiencegrpc.NewHandler(experienceService)
+	experiencepb.RegisterExperienceServiceServer(grpcServer, experienceHandler)
+	logger.Info("Experience service registered")
+
+	// 14. Initialize Technology module
+	techRepo := techrepo.NewPostgresRepository(db)
+	techService := techsvc.NewService(techRepo)
+	techHandler := techgrpc.NewHandler(techService)
+	techpb.RegisterTechnologyServiceServer(grpcServer, techHandler)
+	logger.Info("Technology service registered")
+
+	// 15. Initialize Certificate module
+	certRepo := certrepo.NewPostgresRepository(db)
+	certService := certsvc.NewService(certRepo)
+	certHandler := certgrpc.NewHandler(certService)
+	certpb.RegisterCertificateServiceServer(grpcServer, certHandler)
+	logger.Info("Certificate service registered")
+
+	// 16. Initialize Skill module
+	skillRepo := skillrepo.NewPostgresRepository(db)
+	skillService := skillsvc.NewService(skillRepo)
+	skillHandler := skillgrpc.NewHandler(skillService)
+	skillpb.RegisterSkillServiceServer(grpcServer, skillHandler)
+	logger.Info("Skill service registered")
 
 	return &App{
 		Config:     cfg,

@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package experience;
+
+option go_package = "portfolio-ai/proto/experience";
+
+import "experience/experience.proto";
+import "google/protobuf/timestamp.proto";
+
+service ExperienceService {
+  rpc ListExperiences(ListExperiencesRequest) returns (ListExperiencesResponse);
+  rpc GetExperience(GetExperienceRequest) returns (GetExperienceResponse);
+  rpc CreateExperience(CreateExperienceRequest) returns (CreateExperienceResponse);
+  rpc UpdateExperience(UpdateExperienceRequest) returns (UpdateExperienceResponse);
+  rpc DeleteExperience(DeleteExperienceRequest) returns (DeleteExperienceResponse);
+}
+
+message ListExperiencesRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message ListExperiencesResponse {
+  repeated Experience experiences = 1;
+  int32 total = 2;
+}
+
+message GetExperienceRequest {
+  string id = 1;
+}
+
+message GetExperienceResponse {
+  Experience experience = 1;
+}
+
+message CreateExperienceRequest {
+  string company = 1;
+  string position = 2;
+  string employment_type = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+  bool current_job = 6;
+  string location = 7;
+  string description = 8;
+  int32 display_order = 9;
+  string company_logo = 10;
+  repeated string skills = 11;
+  string remote_type = 12;
+}
+
+message CreateExperienceResponse {
+  Experience experience = 1;
+}
+
+message UpdateExperienceRequest {
+  string id = 1;
+  string company = 2;
+  string position = 3;
+  string employment_type = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+  bool current_job = 7;
+  string location = 8;
+  string description = 9;
+  int32 display_order = 10;
+  string company_logo = 11;
+  repeated string skills = 12;
+  string remote_type = 13;
+}
+
+message UpdateExperienceResponse {
+  Experience experience = 1;
+}
+
+message DeleteExperienceRequest {
+  string id = 1;
+}
+
+message DeleteExperienceResponse {
+  bool success = 1;
+}

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package technology;
+
+option go_package = "portfolio-ai/proto/technology";
+
+import "google/protobuf/timestamp.proto";
+
+message Technology {
+  string id = 1;
+  string name = 2;
+  string category = 3;
+  string icon = 4;
+  string color = 5;
+  string official_url = 6;
+  string logo = 7;
+  google.protobuf.Timestamp created_at = 8;
+}

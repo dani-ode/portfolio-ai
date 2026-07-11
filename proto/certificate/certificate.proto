@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package certificate;
+
+option go_package = "portfolio-ai/proto/certificate";
+
+import "google/protobuf/timestamp.proto";
+
+message Certificate {
+  string id = 1;
+  string title = 2;
+  string issuer = 3;
+  google.protobuf.Timestamp issue_date = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+  string credential_id = 6;
+  string credential_url = 7;
+  string thumbnail = 8;
+  repeated string skills = 9;
+  string issuer_logo = 10;
+  google.protobuf.Timestamp created_at = 11;
+}

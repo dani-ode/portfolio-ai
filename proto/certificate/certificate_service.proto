@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package certificate;
+
+option go_package = "portfolio-ai/proto/certificate";
+
+import "certificate/certificate.proto";
+import "google/protobuf/timestamp.proto";
+
+service CertificateService {
+  rpc ListCertificates(ListCertificatesRequest) returns (ListCertificatesResponse);
+  rpc GetCertificate(GetCertificateRequest) returns (GetCertificateResponse);
+  rpc CreateCertificate(CreateCertificateRequest) returns (CreateCertificateResponse);
+  rpc UpdateCertificate(UpdateCertificateRequest) returns (UpdateCertificateResponse);
+  rpc DeleteCertificate(DeleteCertificateRequest) returns (DeleteCertificateResponse);
+}
+
+message ListCertificatesRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message ListCertificatesResponse {
+  repeated Certificate certificates = 1;
+  int32 total = 2;
+}
+
+message GetCertificateRequest {
+  string id = 1;
+}
+
+message GetCertificateResponse {
+  Certificate certificate = 1;
+}
+
+message CreateCertificateRequest {
+  string title = 1;
+  string issuer = 2;
+  google.protobuf.Timestamp issue_date = 3;
+  google.protobuf.Timestamp expiration_date = 4;
+  string credential_id = 5;
+  string credential_url = 6;
+  string thumbnail = 7;
+  repeated string skills = 8;
+  string issuer_logo = 9;
+}
+
+message CreateCertificateResponse {
+  Certificate certificate = 1;
+}
+
+message UpdateCertificateRequest {
+  string id = 1;
+  string title = 2;
+  string issuer = 3;
+  google.protobuf.Timestamp issue_date = 4;
+  google.protobuf.Timestamp expiration_date = 5;
+  string credential_id = 6;
+  string credential_url = 7;
+  string thumbnail = 8;
+  repeated string skills = 9;
+  string issuer_logo = 10;
+}
+
+message UpdateCertificateResponse {
+  Certificate certificate = 1;
+}
+
+message DeleteCertificateRequest {
+  string id = 1;
+}
+
+message DeleteCertificateResponse {
+  bool success = 1;
+}

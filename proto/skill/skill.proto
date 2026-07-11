@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package skill;
+
+option go_package = "portfolio-ai/proto/skill";
+
+import "google/protobuf/timestamp.proto";
+import "technology/technology.proto";
+
+message Skill {
+  string id = 1;
+  int32 display_order = 2;
+  string technology_id = 3;
+  string level = 4;
+  float years = 5;
+  bool favorite = 6;
+  google.protobuf.Timestamp created_at = 7;
+  technology.Technology technology = 8;
+}

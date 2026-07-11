@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package experience;
+
+option go_package = "portfolio-ai/proto/experience";
+
+import "google/protobuf/timestamp.proto";
+
+message Experience {
+  string id = 1;
+  string company = 2;
+  string position = 3;
+  string employment_type = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+  bool current_job = 7;
+  string location = 8;
+  string description = 9;
+  int32 display_order = 10;
+  string company_logo = 11;
+  repeated string skills = 12;
+  string remote_type = 13;
+  google.protobuf.Timestamp created_at = 14;
+  google.protobuf.Timestamp updated_at = 15;
+}

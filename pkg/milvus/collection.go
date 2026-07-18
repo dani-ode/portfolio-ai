@@ -155,3 +155,15 @@ func (c *Client) ensureVisitorMemoryCollection(ctx context.Context, collectionNa
 
 	return nil
 }
+
+// SetAlias drops any existing alias with the given name and recreates it to point to the specified collection.
+func (c *Client) SetAlias(ctx context.Context, collectionName string, aliasName string) error {
+	// Drop the alias first (ignore error if it doesn't exist)
+	_ = c.DropAlias(ctx, aliasName)
+
+	if err := c.CreateAlias(ctx, collectionName, aliasName); err != nil {
+		return fmt.Errorf("failed to create alias %s for collection %s: %w", aliasName, collectionName, err)
+	}
+	return nil
+}
+

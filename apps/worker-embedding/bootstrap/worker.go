@@ -40,9 +40,12 @@ func RunEmbeddingWorker() {
 
 	// Initialize embedding repo and active profile config
 	embeddingRepo := embeddingrepo.NewPostgresRepository(db)
-	profile, err := embeddingRepo.GetActiveProfile(ctx)
+	enabledProfiles, err := embeddingRepo.ListEnabledProfiles(ctx)
 	if err != nil {
-		log.Fatalf("failed to get active embedding profile: %v", err)
+		log.Fatalf("failed to list enabled embedding profiles: %v", err)
+	}
+	if len(enabledProfiles) == 0 {
+		log.Fatalf("no enabled embedding profiles found")
 	}
 
 	// Initialize Milvus
@@ -52,9 +55,13 @@ func RunEmbeddingWorker() {
 	if err != nil {
 		log.Fatalf("failed to connect to milvus: %v", err)
 	}
-	if err := mClient.InitCollection(ctx, profile.KnowledgeCollection, profile.VisitorCollection, profile.Dimension, profile.MetricType); err != nil {
-		log.Fatalf("failed to init milvus collection: %v", err)
+
+	for _, p := range enabledProfiles {
+		if err := mClient.InitCollection(ctx, p.KnowledgeCollection, p.VisitorCollection, p.Dimension, p.MetricType); err != nil {
+			log.Fatalf("failed to init milvus collection for %s: %v", p.Name, err)
+		}
 	}
+
 
 	// Initialize AI provider registry
 	aiRegistry := provider.NewRegistry()

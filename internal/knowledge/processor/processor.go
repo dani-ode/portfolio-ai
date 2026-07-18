@@ -56,10 +56,13 @@ type knowledgeEventPayload struct {
 func (p *Processor) ProcessEvent(ctx context.Context, event kafka.Event) error {
 	log.Printf("processing knowledge event for %s %s", event.Aggregate, event.AggregateID)
 
-	// Get active embedding profile
-	profile, err := p.embeddingRepo.GetActiveProfile(ctx)
+	// Get all enabled embedding profiles
+	enabledProfiles, err := p.embeddingRepo.ListEnabledProfiles(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to get active embedding profile: %w", err)
+		return fmt.Errorf("failed to list enabled embedding profiles: %w", err)
+	}
+	if len(enabledProfiles) == 0 {
+		return fmt.Errorf("no enabled embedding profiles found")
 	}
 
 	// Parse payload to extract prompt_id
@@ -92,13 +95,14 @@ func (p *Processor) ProcessEvent(ctx context.Context, event kafka.Event) error {
 	}
 
 	if doc.Status == "Embedded" {
-		// Document might already be embedded, but since it's an update event, we should re-embed.
 		log.Printf("Document %s is already Embedded, re-embedding...", doc.ID)
 	}
 
-	// 1. Delete old chunks from Milvus and PostgreSQL
-	if err := p.milvusClient.DeleteVectorsByDocumentID(ctx, profile.KnowledgeCollection, doc.ID); err != nil {
-		log.Printf("warning: failed to delete old vectors from milvus for doc %s: %v", doc.ID, err)
+	// 1. Delete old chunks from Milvus (for all enabled profiles) and PostgreSQL (once)
+	for _, profile := range enabledProfiles {
+		if err := p.milvusClient.DeleteVectorsByDocumentID(ctx, profile.KnowledgeCollection, doc.ID); err != nil {
+			log.Printf("warning: failed to delete old vectors from milvus for doc %s in %s: %v", doc.ID, profile.KnowledgeCollection, err)
+		}
 	}
 	if err := p.repo.DeleteChunksByDocumentID(ctx, doc.ID); err != nil {
 		return fmt.Errorf("failed to delete old chunks from db: %w", err)
@@ -116,55 +120,60 @@ func (p *Processor) ProcessEvent(ctx context.Context, event kafka.Event) error {
 	}
 
 	var chunks []entity.KnowledgeChunk
-	var vectors []milvus.KnowledgeVector
-
 	for _, ac := range aiChunks {
 		chunkID := ulid.New()
 		ac.ID = chunkID
 		ac.CreatedAt = time.Now()
 		ac.TokenCount = 0 // can be calculated if needed
-
-		// 3. Generate Embedding for each chunk's content using the profile's provider and model
-		embeddingProvider, err := p.aiRegistry.Get(profile.Provider)
-		if err != nil {
-			return fmt.Errorf("failed to get embedding provider %q: %w", profile.Provider, err)
-		}
-		embedding, err := embeddingProvider.GenerateEmbedding(ctx, profile.Model, ac.Content)
-		if err != nil {
-			return fmt.Errorf("failed to generate embedding for chunk %s: %w", chunkID, err)
-		}
-
 		chunks = append(chunks, ac)
-
-		vectors = append(vectors, milvus.KnowledgeVector{
-			ChunkID:    chunkID,
-			DocumentID: doc.ID,
-			SourceType: doc.SourceType,
-			SourceID:   doc.SourceID,
-			Embedding:  embedding,
-		})
 	}
 
-	// 4. Save chunks to DB
+	// 3. Save new chunks to Postgres (once)
 	if err := p.repo.CreateChunks(ctx, chunks); err != nil {
 		return fmt.Errorf("failed to save chunks to db: %w", err)
 	}
 
-	// 5. Upsert to Milvus using active profile's collection name
-	if err := p.milvusClient.UpsertVectors(ctx, profile.KnowledgeCollection, vectors); err != nil {
-		return fmt.Errorf("failed to upsert vectors to milvus: %w", err)
+	// 4. Generate embeddings and upsert vectors to Milvus for each enabled embedding profile
+	for _, profile := range enabledProfiles {
+		var vectors []milvus.KnowledgeVector
+		embeddingProvider, err := p.aiRegistry.Get(profile.Provider)
+		if err != nil {
+			return fmt.Errorf("failed to get embedding provider %q for profile %s: %w", profile.Provider, profile.Name, err)
+		}
+
+		for _, c := range chunks {
+			embedding, err := embeddingProvider.GenerateEmbedding(ctx, profile.Model, c.Content)
+			if err != nil {
+				return fmt.Errorf("failed to generate embedding for chunk %s under profile %s: %w", c.ID, profile.Name, err)
+			}
+
+			vectors = append(vectors, milvus.KnowledgeVector{
+				ChunkID:    c.ID,
+				DocumentID: doc.ID,
+				SourceType: doc.SourceType,
+				SourceID:   doc.SourceID,
+				Embedding:  embedding,
+			})
+		}
+
+		if err := p.milvusClient.UpsertVectors(ctx, profile.KnowledgeCollection, vectors); err != nil {
+			return fmt.Errorf("failed to upsert vectors to milvus for profile %s: %w", profile.Name, err)
+		}
+		log.Printf("successfully updated %d vector(s) in Milvus collection %s", len(vectors), profile.KnowledgeCollection)
 	}
 
-	// 6. Update document status
+	// 5. Update document status in PostgreSQL
 	now := time.Now()
 	doc.Status = "Embedded"
-	doc.EmbeddingModel = profile.Model
+	if len(enabledProfiles) > 0 {
+		doc.EmbeddingModel = enabledProfiles[0].Model
+	}
 	doc.LastEmbeddedAt = &now
 
 	if err := p.repo.UpdateDocument(ctx, doc); err != nil {
 		return fmt.Errorf("failed to update document status: %w", err)
 	}
 
-	log.Printf("successfully processed and embedded document %s with %d chunks using model %s", doc.ID, len(chunks), modelName)
+	log.Printf("successfully processed and embedded document %s with %d chunks for all enabled profiles", doc.ID, len(chunks))
 	return nil
 }

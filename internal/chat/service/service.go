@@ -11,12 +11,14 @@ import (
 	aiprovider "dan-ai/internal/ai/provider"
 	"dan-ai/internal/chat/entity"
 	"dan-ai/internal/chat/repository"
+	embeddingEntity "dan-ai/internal/embedding/entity"
 	embeddingrepo "dan-ai/internal/embedding/repository"
 	memoryrepo "dan-ai/internal/memory/repository"
 	outboxEntity "dan-ai/internal/outbox/entity"
 	outboxrepo "dan-ai/internal/outbox/repository"
 	promptrepo "dan-ai/internal/prompt/repository"
 	visitorsvc "dan-ai/internal/visitor/service"
+	"dan-ai/pkg/config"
 	"dan-ai/pkg/milvus"
 	"dan-ai/pkg/ulid"
 )
@@ -200,10 +202,22 @@ func (s *service) SendChatMessage(ctx context.Context, sessionID, visitorID, pro
 	sessionID = session.ID
 	visitorID = session.VisitorID
 
-	// Get active embedding profile
-	profile, err := s.embeddingRepo.GetActiveProfile(ctx)
+	// Get configured embedding profile
+	chatProfileName := "e5"
+	cfg, err := config.Load()
+	if err == nil && cfg.AI.ChatEmbeddingProfile != "" {
+		chatProfileName = cfg.AI.ChatEmbeddingProfile
+	}
+
+	var profile *embeddingEntity.EmbeddingProfile
+	profile, err = s.embeddingRepo.GetProfileByName(ctx, chatProfileName)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get active embedding profile: %w", err)
+		// Fallback to first enabled profile
+		enabledProfiles, err2 := s.embeddingRepo.ListEnabledProfiles(ctx)
+		if err2 != nil || len(enabledProfiles) == 0 {
+			return nil, fmt.Errorf("failed to get chat embedding profile: %w", err)
+		}
+		profile = &enabledProfiles[0]
 	}
 
 	// 2. Fetch dialogue history (before the new message is inserted)

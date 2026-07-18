@@ -36,3 +36,7 @@ migrate-down:
 
 migrate-force:
 	$(compose) run --rm migrate -path=/migrations -database=$(DATABASE_URL) force 1
+
+.PHONY: reindex
+reindex:
+	go run ./apps/reindex

@@ -7,7 +7,7 @@ import (
 )
 
 type Repository interface {
-	GetActiveProfile(ctx context.Context) (*entity.EmbeddingProfile, error)
+	ListEnabledProfiles(ctx context.Context) ([]entity.EmbeddingProfile, error)
 	GetProfileByName(ctx context.Context, name string) (*entity.EmbeddingProfile, error)
 }
 
@@ -19,13 +19,10 @@ func NewPostgresRepository(db *gorm.DB) Repository {
 	return &postgresRepository{db: db}
 }
 
-func (r *postgresRepository) GetActiveProfile(ctx context.Context) (*entity.EmbeddingProfile, error) {
-	var profile entity.EmbeddingProfile
-	err := r.db.WithContext(ctx).Where("is_active = ?", true).First(&profile).Error
-	if err != nil {
-		return nil, err
-	}
-	return &profile, nil
+func (r *postgresRepository) ListEnabledProfiles(ctx context.Context) ([]entity.EmbeddingProfile, error) {
+	var profiles []entity.EmbeddingProfile
+	err := r.db.WithContext(ctx).Where("enabled = ?", true).Find(&profiles).Error
+	return profiles, err
 }
 
 func (r *postgresRepository) GetProfileByName(ctx context.Context, name string) (*entity.EmbeddingProfile, error) {

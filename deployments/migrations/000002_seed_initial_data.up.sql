@@ -88,7 +88,7 @@ ON CONFLICT (name) DO UPDATE SET
     version = EXCLUDED.version;
 
 -- Insert active embedding profile (Gemini is default with 3072 dim)
-INSERT INTO embedding_profiles (id, name, provider, model, dimension, metric_type, knowledge_collection, visitor_collection, is_active, created_at, updated_at)
+INSERT INTO embedding_profiles (id, name, provider, model, dimension, metric_type, knowledge_collection, visitor_collection, enabled, created_at, updated_at)
 VALUES (
     '01H00000000000000000000008',
     'e5',
@@ -111,7 +111,7 @@ VALUES (
     'COSINE',
     'dan_knowledge_openai',
     'visitor_knowledge_openai',
-    FALSE,
+    TRUE,
     NOW(),
     NOW()
 )
@@ -122,5 +122,6 @@ ON CONFLICT (name) DO UPDATE SET
     metric_type = EXCLUDED.metric_type,
     knowledge_collection = EXCLUDED.knowledge_collection,
     visitor_collection = EXCLUDED.visitor_collection,
-    is_active = EXCLUDED.is_active,
+    enabled = EXCLUDED.enabled,
     updated_at = NOW();
+

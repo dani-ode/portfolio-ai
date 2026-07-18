@@ -253,7 +253,7 @@ CREATE TABLE embedding_profiles (
     metric_type TEXT NOT NULL DEFAULT 'COSINE',
     knowledge_collection TEXT NOT NULL,
     visitor_collection TEXT NOT NULL,
-    is_active BOOLEAN DEFAULT FALSE,
+    enabled BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

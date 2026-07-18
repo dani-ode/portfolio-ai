@@ -11,7 +11,7 @@ type EmbeddingProfile struct {
 	MetricType          string    `gorm:"type:text;not null;default:'COSINE'"`
 	KnowledgeCollection string    `gorm:"type:text;not null"`
 	VisitorCollection   string    `gorm:"type:text;not null"`
-	IsActive            bool      `gorm:"type:boolean;default:false"`
+	Enabled             bool      `gorm:"type:boolean;default:false"`
 	CreatedAt           time.Time `gorm:"type:timestamptz;not null;default:now()"`
 	UpdatedAt           time.Time `gorm:"type:timestamptz;not null;default:now()"`
 }
